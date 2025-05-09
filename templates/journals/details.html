@@ -1,0 +1,92 @@
+{% extends "layouts/base.html" %} {% block content %}
+<div class="journal-container">
+    <div class="breadcrumb">Journals / <a href="#">Full Article</a></div>
+    <div class="volume">
+        Volume: {{journal.volume_issue_display()}} | Page: {{journal.pages}}
+    </div>
+    <div class="authors" style="display: flex; align-items: center">
+        <img src="/static/assets/group.png" alt="" style="margin-right: 5px" />
+        {{journal.authors}}
+    </div>
+    <div class="article-title">{{journal.title}}</div>
+    <div class="abstract">
+        <strong>Abstract:</strong>
+        <p>{{journal.abstract_text}}</p>
+    </div>
+    <div class="keywords">Keywords: {{journal.keywords}}</div>
+    <div class="citation">
+        Citation: {{journal.authors}} ({{journal.publication_date.year()}}).
+        {{journal.title}}. African Journal of Educational Technology,
+        {{journal.volume_issue_display()}}, {{journal.pages}}.
+    </div>
+    <a
+        href="/download/{{journal.pdf_url}}"
+        class="download-btn"
+        target="_blank"
+        download
+        >Download Full Article</a
+    >
+
+    <!-- Optional: Add a delete button here (requires JS) -->
+    {% if is_admin %}
+    <div class="admin-actions" style="display: inline-block; margin-left: 10px">
+        <a
+            href="/admin/{{ id_string }}/edit"
+            style="
+                background-color: #2a166f;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                text-decoration: none;
+                margin-right: 10px;
+            "
+            >Edit Article</a
+        >
+
+        <button
+            onclick="deleteJournal('{{ id_string }}')"
+            style="
+                background-color: red;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            "
+        >
+            Delete Article
+        </button>
+    </div>
+    {% endif %}
+    <script>
+        async function deleteJournal(journalId) {
+            if (
+                !confirm(
+                    `Are you sure you want to delete journal ${journalId}? This cannot be undone.`,
+                )
+            ) {
+                return;
+            }
+            try {
+                const response = await fetch(`/admin/journals/${journalId}`, {
+                    method: "DELETE",
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert(result.message);
+                    window.location.href = "/journal"; // Redirect after deletion
+                } else {
+                    alert(
+                        `Error: ${result.message || "Failed to delete journal"}`,
+                    );
+                }
+            } catch (error) {
+                console.error("Deletion error:", error);
+                alert("An error occurred while trying to delete the journal.");
+            }
+        }
+    </script>
+</div>
+{% endblock %}

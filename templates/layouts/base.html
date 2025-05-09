@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="AJET Journal - A platform for academic articles, research, and manuscript submissions."
+        />
+        <meta
+            name="keywords"
+            content="AJET, Journal, Academic Articles, Research, Manuscripts, Editorial Board"
+        />
+        <meta property="og:title" content="AJET Journal" />
+        <title>{% block title %}Journal Site{% endblock %}</title>
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <script src="/static/js/main.js"></script>
+    </head>
+    <body>
+        <!-- Hero Section with Top Navigation -->
+        <header class="hero">
+            <nav class="top-nav">
+                <div class="nav-logo">
+                    <a href="/" class="nav-logo-link">
+                        <img
+                            src="/static/assets/aaua-logo.png"
+                            alt="AAUA Logo - AJET Journal"
+                            class="nav-logo-image"
+                        />
+                        <span class="nav-logo-text">AJET Journal</span>
+                    </a>
+                </div>
+                <div class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="nav-items">
+                    <a href="/">Home</a>
+                    <a href="/journal">Articles</a>
+                    <a href="/submit">Submit an Article</a>
+                    <a href="/manuscript">Manuscript Guide</a>
+                    <a href="/editorial-board">Editorial Board</a>
+                    <a href="/about">Contact Us</a>
+                </div>
+            </nav>
+            {% block hero %}{% endblock %}
+        </header>
+        <section class="section">
+            <div class="container">{% block content %}{% endblock %}</div>
+        </section>
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <a href="/" class="footer-logo-link">
+                            <img
+                                src="/static/assets/aaua-logo.png"
+                                alt="AAUA Logo - AJET Journal"
+                                class="footer-logo-image"
+                            />
+                            <span class="footer-logo-text">AJET Journal</span>
+                        </a>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/">Home</a>
+                        <a href="/journals/current">Articles</a>
+                        <a href="/submit">Submit an Article</a>
+                        <a href="/manuscript">Manuscript Guide</a>
+                        <a href="/editorial-board">Editorial Board</a>
+                        <a href="/about">Contact Us</a>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="copyright">© 2025 AJET. All rights reserved.</div>
+            </div>
+        </footer>
+    </body>
+</html>
