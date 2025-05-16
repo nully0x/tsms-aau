@@ -1,4 +1,5 @@
 /target
 .env
 uploads
-aau_ajet.db
+aau_tsms.db
+data
