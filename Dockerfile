@@ -1,7 +1,7 @@
 FROM rust:1.81.0 AS builder
 
 # Create a new empty shell project
-WORKDIR /usr/src/aau-fsms
+WORKDIR /usr/src/aau-tsms
 COPY . .
 
 RUN mkdir -p data/uploads
@@ -19,18 +19,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory structure
-WORKDIR /usr/src/aau-fsms
+WORKDIR /usr/src/aau-tsms
 RUN mkdir -p src/static
 
 RUN mkdir -p data/uploads
 
 
 # Copy the build artifact from the builder stage
-COPY --from=builder /usr/src/aau-fsms/target/release/journal-site /usr/src/aau-fsms/journal-site
+COPY --from=builder /usr/src/aau-tsms/target/release/journal-site /usr/src/aau-tsms/journal-site
 
 # Copy static files and templates maintaining the original structure
-COPY --from=builder /usr/src/aau-fsms/src/static /usr/src/aau-fsms/src/static
-COPY --from=builder /usr/src/aau-fsms/templates /usr/src/aau-fsms/templates
+COPY --from=builder /usr/src/aau-tsms/src/static /usr/src/aau-tsms/src/static
+COPY --from=builder /usr/src/aau-tsms/templates /usr/src/aau-tsms/templates
 
 ENV RUST_LOG=info
 

@@ -1,7 +1,7 @@
 use rusqlite::Connection;
 
 pub fn init_db() -> Result<Connection, rusqlite::Error> {
-    let conn = Connection::open("./data/aau_fsms.db")?;
+    let conn = Connection::open("./data/aau_tsms.db")?;
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS submissions (
