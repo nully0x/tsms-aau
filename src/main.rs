@@ -12,6 +12,7 @@ use log::{error, info, warn};
 mod config;
 mod db;
 mod errors;
+mod middleware;
 mod models;
 mod routes;
 mod utils;
@@ -72,6 +73,25 @@ async fn main() -> std::io::Result<()> {
     let secret_key = Key::from(session_secret.as_bytes());
     // --- End Session Key ---
 
+    // --- Rate Limiting ---
+    let rate_limit_max = std::env::var("RATE_LIMIT_MAX_REQUESTS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(120);
+    let rate_limit_window = std::env::var("RATE_LIMIT_WINDOW_SECS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(60);
+    let rate_limit_store =
+        std::sync::Arc::new(actix_web_ratelimit::store::MemoryStore::new());
+    let rate_limit_config =
+        middleware::rate_limit_config(rate_limit_max, rate_limit_window);
+    info!(
+        "Rate limiting enabled: {} requests per {}s per client",
+        rate_limit_max, rate_limit_window
+    );
+    // --- End Rate Limiting ---
+
     info!("Starting server on http://{}:{}...", host, port);
 
     HttpServer::new(move || {
@@ -79,7 +99,7 @@ async fn main() -> std::io::Result<()> {
         let secret_key = secret_key.clone();
 
         App::new()
-            // --- Session Middleware ---
+            // --- Session Middleware (innermost) ---
             .wrap(
                 SessionMiddleware::builder(CookieSessionStore::default(), secret_key) // Use the cloned key
                     .cookie_secure(false) // Set to true if using HTTPS
@@ -90,7 +110,15 @@ async fn main() -> std::io::Result<()> {
                     .build(),
             )
             // --- End Session Middleware ---
-            // --- Logging Middleware ---
+            // Rate Limit — before Logger so Logger records 429s
+            .wrap(actix_web_ratelimit::RateLimit::new(
+                rate_limit_config.clone(),
+                rate_limit_store.clone(),
+            ))
+            // Scraper Block — outside RateLimit so scrapers don't count
+            // against legit clients' budgets; inside Logger so 403s log
+            .wrap(actix_web::middleware::from_fn(middleware::block_scrapers))
+            // --- Logging Middleware (outermost so it records 403s and 429s) ---
             .wrap(actix_web::middleware::Logger::default())
             // --- End Logging ---
             // Serve static files
